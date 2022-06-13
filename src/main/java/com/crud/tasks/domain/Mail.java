@@ -2,9 +2,11 @@ package com.crud.tasks.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Builder
+@RequiredArgsConstructor
 public class Mail {
 
     private final String mailTo;
