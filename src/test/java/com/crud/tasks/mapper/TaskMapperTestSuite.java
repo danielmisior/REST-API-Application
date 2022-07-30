@@ -25,7 +25,7 @@ public class TaskMapperTestSuite {
         //Given
         TaskDto taskDto = new TaskDto(1L, "title", "content");
         //When
-        Task task = taskMapper.MapToTask(taskDto);
+        Task task = taskMapper.mapToTask(taskDto);
         //Then
         assertNotNull(task.getId());
         assertEquals("title", task.getTitle());
