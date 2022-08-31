@@ -5,13 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -20,8 +17,8 @@ public class SimpleEmailService {
 
     private final JavaMailSender javaMailSender;
 
-    @Autowired
-    private MailCreatorService mailCreatorService;
+
+    private final MailCreatorService mailCreatorService;
 
     private MimeMessagePreparator createMimeMessage(final Mail mail) {
         return mimeMessage -> {
@@ -32,21 +29,29 @@ public class SimpleEmailService {
         };
     }
 
-    private SimpleMailMessage createMailMessage(final Mail mail) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-
-        mailMessage.setTo(mail.getMailTo());
-        Optional<String> toCc = Optional.ofNullable(mail.getToCc());
-        toCc.ifPresent(mailMessage::setCc);
-        mailMessage.setSubject(mail.getSubject());
-        mailMessage.setText(mailCreatorService.buildTrelloCardEmail(mail.getMessage()));
-        return mailMessage;
+    private MimeMessagePreparator createDailyMimeMessage(final Mail mail) {
+        return mimeMessage -> {
+          MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+          messageHelper.setTo(mail.getMailTo());
+          messageHelper.setSubject(mail.getSubject());
+          messageHelper.setText(mailCreatorService.buildDailyTrelloEmail(mail.getMessage()), true);
+        };
     }
 
     public void send(final Mail mail) {
         log.info("Starting email preparation...");
         try {
             javaMailSender.send(createMimeMessage(mail));
+            log.info("Email has been sent.");
+        } catch (MailException e) {
+            log.error("Failed to process email sending: " + e.getMessage(), e);
+        }
+    }
+
+    public void sendDailyEmail(final Mail mail) {
+        log.info("Starting email preparation...");
+        try {
+            javaMailSender.send(createDailyMimeMessage(mail));
             log.info("Email has been sent.");
         } catch (MailException e) {
             log.error("Failed to process email sending: " + e.getMessage(), e);
