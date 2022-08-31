@@ -33,7 +33,7 @@ public class SimpleEmailService {
           MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
           messageHelper.setTo(mail.getMailTo());
           messageHelper.setSubject(mail.getSubject());
-          messageHelper.setText(mailCreatorService.buildDailyTrelloEmail(mail.getMessage()), true);
+          messageHelper.setText(mailCreatorService.buildDailyEmail(mail.getMessage()), true);
         };
     }
 
