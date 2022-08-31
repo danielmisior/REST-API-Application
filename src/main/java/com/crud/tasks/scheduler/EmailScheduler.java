@@ -21,7 +21,6 @@ public class EmailScheduler {
     private static final String SUBJECT_INFO = "Application: Information email";
 
     @Scheduled(cron = "0 0 10 * * *")
-    @Scheduled(fixedDelay = 10000)
     public void sendInformationEmail() {
         long size = taskRepository.count();
         if(size == 1) {
@@ -56,6 +55,26 @@ public class EmailScheduler {
                             null,
                             SUBJECT_INFO,
                             "You have " + taskAmount + " task in your database and "
+                                    + trelloAmount + " Trello board"
+                    )
+            );
+        } else if (taskAmount == 1 && trelloAmount != 1) {
+            simpleEmailService.sendDailyEmail(
+                    new Mail(
+                            adminConfig.getAdminMail(),
+                            null,
+                            SUBJECT_INFO,
+                            "You have " + taskAmount + " task in your database and "
+                                    + trelloAmount + " Trello boards"
+                    )
+            );
+        }else if (taskAmount != 1 && trelloAmount == 1) {
+            simpleEmailService.sendDailyEmail(
+                    new Mail(
+                            adminConfig.getAdminMail(),
+                            null,
+                            SUBJECT_INFO,
+                            "You have " + taskAmount + " tasks in your database and "
                                     + trelloAmount + " Trello board"
                     )
             );
